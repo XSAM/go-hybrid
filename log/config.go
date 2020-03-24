@@ -12,24 +12,24 @@ type Config struct {
 	ZapLevel  zapcore.Level
 }
 
-// DevelopmentConfig set background logger to develop mode.
-func DevelopmentConfig() Config {
+// DevelopmentAndJSONConfig set background logger to development mode with JSON style.
+func DevelopmentAndJSONConfig() Config {
 	config := zap.NewDevelopmentConfig()
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 
 	return Config{ZapConfig: config, ZapLevel: zapcore.DebugLevel}
 }
 
-// ProductionConfig set background logger to develop mode.
-func ProductionConfig() Config {
+// ProductionAndJSONConfig set background logger to production mode with JSON style.
+func ProductionAndJSONConfig() Config {
 	config := zap.NewProductionConfig()
 	config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 
 	return Config{ZapConfig: config, ZapLevel: zapcore.InfoLevel}
 }
 
-// CLIToolDevelopmentConfig set background logger to develop mode for CLI.
-func CLIToolDevelopmentConfig() Config {
+// DevelopmentAndTextConfig set background logger to development mode with text style.
+func DevelopmentAndTextConfig() Config {
 	config := zap.NewDevelopmentConfig()
 	if runtime.GOOS != "windows" {
 		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
@@ -40,8 +40,8 @@ func CLIToolDevelopmentConfig() Config {
 	return Config{ZapConfig: config, ZapLevel: zapcore.DebugLevel}
 }
 
-// CLIToolProductionConfig set background logger to production mode for CLI.
-func CLIToolProductionConfig() Config {
+// ProductionAndTextConfig set background logger to production mode with text style.
+func ProductionAndTextConfig() Config {
 	config := zap.NewProductionConfig()
 	config.Encoding = "console"
 	if runtime.GOOS != "windows" {

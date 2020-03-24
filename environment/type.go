@@ -3,14 +3,14 @@ package environment
 type ModeType string
 
 const (
-	PRODUCTION_MODE  ModeType = "production"
-	STAGING_MODE              = "staging"
-	DEVELOPMENT_MODE          = "development"
+	ModeProduction  ModeType = "production"
+	ModeStaging              = "staging"
+	ModeDevelopment          = "development"
 )
 
-type InteractionType string
+type LogStyleType string
 
 const (
-	NORMAL_INTERACTIION InteractionType = "normal"
-	CLI_INTERACTION                     = "CLI"
+	LogStyleJSON LogStyleType = "json"
+	LogStyleText              = "text"
 )

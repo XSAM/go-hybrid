@@ -34,57 +34,57 @@ func TestError(t *testing.T) {
 
 	testCases := []struct {
 		mode        environment.ModeType
-		interaction environment.InteractionType
+		interaction environment.LogStyleType
 		err         error
 	}{
 		// Normal error
 		{
-			mode:        environment.DEVELOPMENT_MODE,
-			interaction: environment.NORMAL_INTERACTIION,
+			mode:        environment.ModeDevelopment,
+			interaction: environment.LogStyleJSON,
 			err:         normalError,
 		},
 		{
-			mode:        environment.DEVELOPMENT_MODE,
-			interaction: environment.CLI_INTERACTION,
+			mode:        environment.ModeDevelopment,
+			interaction: environment.LogStyleText,
 			err:         normalError,
 		},
 		{
-			mode:        environment.PRODUCTION_MODE,
-			interaction: environment.NORMAL_INTERACTIION,
+			mode:        environment.ModeProduction,
+			interaction: environment.LogStyleJSON,
 			err:         normalError,
 		},
 		{
-			mode:        environment.PRODUCTION_MODE,
-			interaction: environment.CLI_INTERACTION,
+			mode:        environment.ModeProduction,
+			interaction: environment.LogStyleText,
 			err:         normalError,
 		},
 
 		// errorw error
 		{
-			mode:        environment.DEVELOPMENT_MODE,
-			interaction: environment.NORMAL_INTERACTIION,
+			mode:        environment.ModeDevelopment,
+			interaction: environment.LogStyleJSON,
 			err:         errorwError,
 		},
 		{
-			mode:        environment.DEVELOPMENT_MODE,
-			interaction: environment.CLI_INTERACTION,
+			mode:        environment.ModeDevelopment,
+			interaction: environment.LogStyleText,
 			err:         errorwError,
 		},
 		{
-			mode:        environment.PRODUCTION_MODE,
-			interaction: environment.NORMAL_INTERACTIION,
+			mode:        environment.ModeProduction,
+			interaction: environment.LogStyleJSON,
 			err:         errorwError,
 		},
 		{
-			mode:        environment.PRODUCTION_MODE,
-			interaction: environment.CLI_INTERACTION,
+			mode:        environment.ModeProduction,
+			interaction: environment.LogStyleText,
 			err:         errorwError,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%s-%s-%T", tc.mode, tc.interaction, tc.err), func(t *testing.T) {
-			environment.Interaction = tc.interaction
+			environment.LogStyle = tc.interaction
 			environment.Mode = tc.mode
 			logger.Info("testing", Error(tc.err))
 

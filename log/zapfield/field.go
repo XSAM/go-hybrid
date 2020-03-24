@@ -15,20 +15,19 @@ func Stack() zap.Field {
 
 // Error add error field
 func Error(err error) zap.Field {
-	if environment.Interaction == environment.CLI_INTERACTION {
-		// CLI
+	if environment.LogStyle == environment.LogStyleText {
+		// Text style
 		switch environment.Mode {
-		case environment.DEVELOPMENT_MODE:
-			// Normal encoding
+		case environment.ModeDevelopment:
 			switch e := err.(type) {
 			case *errorw.Error:
 				return zap.Field{Key: "error", Type: zapcore.ObjectMarshalerType, Interface: e}
 			}
-		case environment.PRODUCTION_MODE:
+		case environment.ModeProduction, environment.ModeStaging:
 			return zap.Field{Key: "error", Type: zapcore.StringType, String: err.Error()}
 		}
 	} else {
-		// Normal
+		// JSON style
 		switch e := err.(type) {
 		case *errorw.Error:
 			return zap.Field{Key: "error", Type: zapcore.ObjectMarshalerType, Interface: e}
