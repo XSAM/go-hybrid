@@ -1,6 +1,6 @@
-default: run-example
+default: build
 
-.PHONY: run-example, example, test
+.PHONY: build, test
 
 git_revision=git rev-parse --short HEAD
 BUILD_TIME=`date +%FT%T%z`
@@ -19,10 +19,7 @@ DEBUG_FLAGS=-gcflags "all=-N -l" ${FLAGS}
 
 export CGO_ENABLED=0
 
-run-example:
-	@go run ${FLAGS} _example/main.go
-
-example:
+build:
 	@echo "> Building example"
 	go build -o bin/example ${FLAGS} _example/main.go
 
