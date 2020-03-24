@@ -24,13 +24,13 @@ const (
 // contextual logger will output common fields from context.
 func Logger(ctx context.Context) *Core {
 	if ctx == nil {
-		return BgLogger()
+		return bgLogger.clone()
 	}
 
 	if ctxLogger, ok := ctx.Value(ContextKey).(*Core); ok {
 		return ctxLogger
 	}
-	return BgLogger()
+	return bgLogger.clone()
 }
 
 // WithLogger add logger to context
@@ -45,7 +45,7 @@ func BgLogger() *Core {
 
 // SetBgLogger set background logger
 func SetBgLogger(logger *Core) {
-	bgLogger = logger
+	bgLogger = logger.clone()
 }
 
 // WithTraceID attach trace id to logger
@@ -59,7 +59,7 @@ func WithKeyValue(ctx context.Context, key, value string) context.Context {
 	if ctxLogger, ok := ctx.Value(ContextKey).(*Core); ok {
 		logger = ctxLogger
 	} else {
-		logger = BgLogger()
+		logger = bgLogger.clone()
 	}
 	logger.Logger = logger.With(zap.String(key, value))
 
@@ -72,7 +72,7 @@ func WithZapOptions(ctx context.Context, option ...zap.Option) context.Context {
 	if ctxLogger, ok := ctx.Value(ContextKey).(*Core); ok {
 		logger = ctxLogger
 	} else {
-		logger = BgLogger()
+		logger = bgLogger.clone()
 	}
 	logger.Logger = logger.WithOptions(option...)
 
