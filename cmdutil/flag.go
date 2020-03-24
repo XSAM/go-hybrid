@@ -142,8 +142,8 @@ func resolveFlags(obj interface{}, flags flags, namePrefix string, depth int) fl
 }
 
 func resolveFieldName(field reflect.StructField, tag flagTag) string {
-	if tag.name != "" {
-		return tag.name
+	if tag.name != nil {
+		return *tag.name
 	}
 
 	// Use field name
@@ -169,7 +169,7 @@ func genEnv(name string) string {
 	return strings.ToUpper(strings.ReplaceAll(name, "-", "_"))
 }
 
-// ResolveFlagVariable register flags and env via tags in struct
+// ResolveFlagVariable register persistent flags and env via tags in struct
 func ResolveFlagVariable(cmd *cobra.Command, f interface{}) {
 	t := reflect.TypeOf(f)
 	if t.Kind() != reflect.Ptr {

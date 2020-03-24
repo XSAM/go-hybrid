@@ -15,7 +15,7 @@ type flagTag struct {
 	// Enable to generate flag
 	enable bool
 
-	name string
+	name *string
 	// Without prefix name
 	flagType  string
 	flat      bool
@@ -65,9 +65,14 @@ func resolveFlagTag(structTag reflect.StructTag) flagTag {
 	if v, ok := flagKV["env"]; ok {
 		enableEnv = parseBool(v)
 	}
+	var name *string
+	if v, ok := flagKV["name"]; ok {
+		name = newString(v)
+	}
+
 	return flagTag{
 		enable:    true,
-		name:      flagKV["name"],
+		name:      name,
 		flat:      flat,
 		flagType:  flagKV["type"],
 		shorthand: flagKV["short"],
@@ -84,4 +89,8 @@ func parseBool(v string) bool {
 	}
 	result, _ := strconv.ParseBool(v)
 	return result
+}
+
+func newString(b string) *string {
+	return &b
 }
