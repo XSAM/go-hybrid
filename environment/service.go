@@ -6,33 +6,35 @@ import (
 	"github.com/XSAM/go-hybrid/log"
 )
 
-var Mode = PRODUCTION_MODE
-var Interaction = NORMAL_INTERACTIION
+var Mode = ModeProduction
+var LogStyle = LogStyleJSON
 
 func DevelopmentMode() {
-	log.BuildAndSetBgLogger(log.DevelopmentConfig())
 	gin.SetMode(gin.DebugMode)
-	Mode = DEVELOPMENT_MODE
-	Interaction = NORMAL_INTERACTIION
+	Mode = ModeDevelopment
 }
 
 func ProductionMode() {
-	log.BuildAndSetBgLogger(log.ProductionConfig())
 	gin.SetMode(gin.ReleaseMode)
-	Mode = PRODUCTION_MODE
-	Interaction = NORMAL_INTERACTIION
+	Mode = ModeProduction
 }
 
-func CLIToolDevelopmentMode() {
-	log.BuildAndSetBgLogger(log.CLIToolDevelopmentConfig())
-	gin.SetMode(gin.DebugMode)
-	Mode = DEVELOPMENT_MODE
-	Interaction = CLI_INTERACTION
+func JSONLogStyle() {
+	LogStyle = LogStyleJSON
+	switch Mode {
+	case ModeDevelopment:
+		log.BuildAndSetBgLogger(log.DevelopmentAndJSONConfig())
+	case ModeProduction, ModeStaging:
+		log.BuildAndSetBgLogger(log.ProductionAndJSONConfig())
+	}
 }
 
-func CLIToolProductionMode() {
-	log.BuildAndSetBgLogger(log.CLIToolProductionConfig())
-	gin.SetMode(gin.ReleaseMode)
-	Mode = PRODUCTION_MODE
-	Interaction = CLI_INTERACTION
+func TextLogStyle() {
+	LogStyle = LogStyleText
+	switch Mode {
+	case ModeDevelopment:
+		log.BuildAndSetBgLogger(log.DevelopmentAndTextConfig())
+	case ModeProduction, ModeStaging:
+		log.BuildAndSetBgLogger(log.ProductionAndTextConfig())
+	}
 }

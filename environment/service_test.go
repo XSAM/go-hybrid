@@ -8,40 +8,42 @@ import (
 
 func TestPresetEnvironments(t *testing.T) {
 	testCases := []struct {
-		name                    string
-		function                func()
-		expectedModeType        ModeType
-		expectedInteractionType InteractionType
+		name                 string
+		functions            []func()
+		expectedModeType     ModeType
+		expectedLogStyleType LogStyleType
 	}{
 		{
-			name:                    "development mode",
-			function:                DevelopmentMode,
-			expectedModeType:        DEVELOPMENT_MODE,
-			expectedInteractionType: NORMAL_INTERACTIION,
+			name:                 "development mode with json log style",
+			functions:            []func(){DevelopmentMode, JSONLogStyle},
+			expectedModeType:     ModeDevelopment,
+			expectedLogStyleType: LogStyleJSON,
 		},
 		{
-			name:                    "production mode",
-			function:                ProductionMode,
-			expectedModeType:        PRODUCTION_MODE,
-			expectedInteractionType: NORMAL_INTERACTIION,
+			name:                 "production mode with json log style",
+			functions:            []func(){ProductionMode, JSONLogStyle},
+			expectedModeType:     ModeProduction,
+			expectedLogStyleType: LogStyleJSON,
 		},
 		{
-			name:                    "CLI tool development mode",
-			function:                CLIToolDevelopmentMode,
-			expectedModeType:        DEVELOPMENT_MODE,
-			expectedInteractionType: CLI_INTERACTION,
+			name:                 "development mode with text log style",
+			functions:            []func(){DevelopmentMode, TextLogStyle},
+			expectedModeType:     ModeDevelopment,
+			expectedLogStyleType: LogStyleText,
 		},
 		{
-			name:                    "CLI tool production mode",
-			function:                CLIToolProductionMode,
-			expectedModeType:        PRODUCTION_MODE,
-			expectedInteractionType: CLI_INTERACTION,
+			name:                 "production mode with text log style",
+			functions:            []func(){ProductionMode, TextLogStyle},
+			expectedModeType:     ModeProduction,
+			expectedLogStyleType: LogStyleText,
 		},
 	}
 
 	for _, tc := range testCases {
-		tc.function()
+		for _, v := range tc.functions {
+			v()
+		}
 		assert.Equal(t, tc.expectedModeType, Mode)
-		assert.Equal(t, tc.expectedInteractionType, Interaction)
+		assert.Equal(t, tc.expectedLogStyleType, LogStyle)
 	}
 }

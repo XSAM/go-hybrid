@@ -8,10 +8,10 @@ import (
 
 func TestPresetConfig(t *testing.T) {
 	presetList := []func() Config{
-		DevelopmentConfig,
-		ProductionConfig,
-		CLIToolDevelopmentConfig,
-		CLIToolProductionConfig,
+		DevelopmentAndJSONConfig,
+		ProductionAndJSONConfig,
+		DevelopmentAndTextConfig,
+		ProductionAndTextConfig,
 	}
 
 	for _, preset := range presetList {
@@ -28,7 +28,7 @@ func TestBuildLogger(t *testing.T) {
 	}{
 		{
 			name:   "valid config",
-			config: DevelopmentConfig(),
+			config: DevelopmentAndJSONConfig(),
 		},
 		{
 			name:          "invalid config",

@@ -8,7 +8,7 @@ var bgLogger *Core
 func init() {
 	logLevels = NewLogLevels(zap.InfoLevel)
 
-	config := ProductionConfig()
+	config := ProductionAndJSONConfig()
 	BuildAndSetBgLogger(config)
 }
 
