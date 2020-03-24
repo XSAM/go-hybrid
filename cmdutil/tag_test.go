@@ -27,7 +27,7 @@ func Test_resolveFlagTag(t *testing.T) {
 		{
 			structTag: `flag:"name=foo type=string flat=true short=s env=true env-split=,"`,
 			expectedFlagTag: flagTag{
-				enable: true, name: "foo", flagType: "string", flat: true, shorthand: "s",
+				enable: true, name: newString("foo"), flagType: "string", flat: true, shorthand: "s",
 				enableEnv: true, envSplit: ",",
 			},
 		},

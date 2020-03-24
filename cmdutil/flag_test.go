@@ -31,11 +31,17 @@ type testFlag struct {
 
 	TestInline
 	Flat testFlat
-	Type testType
+	// Set prefix is empty
+	Flat2 testFlag2 `flag:"name="`
+	Type  testType
 }
 
 type testFlat struct {
 	Flat string `flag:"flat"`
+}
+
+type testFlag2 struct {
+	Flat2 string `flag:""`
 }
 
 type testType struct {
@@ -82,6 +88,8 @@ func Test_resolveFlags(t *testing.T) {
 		{Name: "inline", FullName: "test-inline-inline", FullEnv: "TEST_INLINE_INLINE", Type: "string", Value: "", Pointer: &f.TestInline.Inline},
 
 		{Name: "flat", FullName: "flat", FullEnv: "FLAT", Type: "string", Value: "", Pointer: &f.Flat.Flat},
+
+		{Name: "flat2", FullName: "flat2", FullEnv: "FLAT2", Type: "string", Value: "", Pointer: &f.Flat2.Flat2},
 
 		{Name: "int", FullName: "type-int", FullEnv: "TYPE_INT", Type: "int", Value: 0, Pointer: &f.Type.Int},
 		{Name: "string", FullName: "type-string", FullEnv: "TYPE_STRING", Type: "string", Value: "", Pointer: &f.Type.String},
