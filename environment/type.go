@@ -4,6 +4,7 @@ type ModeType string
 
 const (
 	PRODUCTION_MODE  ModeType = "production"
+	STAGING_MODE              = "staging"
 	DEVELOPMENT_MODE          = "development"
 )
 
