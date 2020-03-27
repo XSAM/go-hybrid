@@ -16,6 +16,8 @@ type testFlag struct {
 	Ignore2 string `json:"ignore_2"`
 	// Cannot return value obtained from unexported field or method
 	ignore3 string `flag:""`
+	// Don't have flag tag
+	Ignore4 TestIgnore
 
 	String string            `flag:"flat=true short=s env=true env-split=," flag-usage:"foo"`
 	Array  []string          `flag:""`
@@ -29,11 +31,11 @@ type testFlag struct {
 	ShortFlat  string `flag:"flat"`
 	ShortUsage string `flag-usage:"foo"`
 
-	TestInline
-	Flat testFlat
+	TestInline `flag:""`
+	Flat       testFlat `flag:""`
 	// Set prefix is empty
 	Flat2 testFlag2 `flag:"name="`
-	Type  testType
+	Type  testType  `flag:""`
 }
 
 type testFlat struct {
@@ -42,6 +44,10 @@ type testFlat struct {
 
 type testFlag2 struct {
 	Flat2 string `flag:""`
+}
+
+type TestIgnore struct {
+	Ignore string `flag:""`
 }
 
 type testType struct {
@@ -360,8 +366,8 @@ func Test_resolveFlagsDepth(t *testing.T) {
 			M    struct {
 				// Should be ignore
 				Name string `flag:""`
-			}
-		}
+			} `flag:""`
+		} `flag:""`
 	}{}
 
 	cmd := cobra.Command{}

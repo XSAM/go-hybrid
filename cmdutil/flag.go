@@ -112,16 +112,17 @@ func resolveFlags(obj interface{}, flags flags, namePrefix string, depth int) fl
 		}
 
 		tag := resolveFlagTag(field.Tag)
+		if !tag.enable {
+			continue
+		}
 		name := resolveFieldName(field, tag)
 		fullName := genFullName(tag.flat, namePrefix, name)
 
-		if field.Type.Kind() == reflect.Struct {
+		switch field.Type.Kind() {
+		case reflect.Struct:
 			flags = resolveFlags(v.Field(i).Addr().Interface(), flags, fullName, depth+1)
-			continue
-		}
-
-		flagType := resolveCobraType(field, tag)
-		if tag.enable {
+		default:
+			flagType := resolveCobraType(field, tag)
 			flag := flag{
 				Name:      name,
 				FullName:  fullName,
