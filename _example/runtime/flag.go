@@ -1,8 +1,8 @@
 package runtime
 
 type Flag struct {
-	Number      int `flag:"env"`
-	Environment Environment
+	Number      int         `flag:"env"`
+	Environment Environment `flag:""`
 }
 
 type Environment struct {
