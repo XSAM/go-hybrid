@@ -15,7 +15,9 @@ type Config struct {
 // DevelopmentAndJSONConfig set background logger to development mode with JSON style.
 func DevelopmentAndJSONConfig() Config {
 	config := zap.NewDevelopmentConfig()
-	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	config.Encoding = "json"
+	// Keeping the development JSON key naming consistent with production JSON key
+	config.EncoderConfig = zap.NewProductionEncoderConfig()
 
 	return Config{ZapConfig: config, ZapLevel: zapcore.DebugLevel}
 }
@@ -23,7 +25,6 @@ func DevelopmentAndJSONConfig() Config {
 // ProductionAndJSONConfig set background logger to production mode with JSON style.
 func ProductionAndJSONConfig() Config {
 	config := zap.NewProductionConfig()
-	config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 
 	return Config{ZapConfig: config, ZapLevel: zapcore.InfoLevel}
 }
