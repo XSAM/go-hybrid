@@ -15,7 +15,7 @@ func TestError_StackTrace(t *testing.T) {
 	st := e.StackTrace()
 
 	want := []string{
-		"github.com/XSAM/go-hybrid/errorw.init\n\t/Users/lls/Programming/git/go-hybrid/errorw/stack_test.go:12",
+		"github.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:12",
 	}
 	for i, w := range want {
 		testFormatRegexp(t, i, st[i], "%+v", w)
@@ -37,7 +37,7 @@ func TestStack_Format(t *testing.T) {
 		},
 		{
 			format: "%+v",
-			want:   "\ngithub.com/XSAM/go-hybrid/errorw.init\n\t/Users/lls/Programming/git/go-hybrid/errorw/stack_test.go:12",
+			want:   "\ngithub.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:12",
 		},
 	}
 
