@@ -102,7 +102,7 @@ func TestError_Error(t *testing.T) {
 		WithWrap("test").
 		WithWrap("test2")
 
-	assert.Equal(t, "test2: test: foo, traceID: trace_id", err.Error())
+	assert.Equal(t, "test2: test: foo. traceID: trace_id. fields: foo:bar", err.Error())
 }
 
 func TestError_Cause(t *testing.T) {
