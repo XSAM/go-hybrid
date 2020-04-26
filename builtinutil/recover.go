@@ -19,8 +19,22 @@ var (
 	slash     = []byte("/")
 )
 
-func Recovery(ctx context.Context, options ...zap.Option) {
-	if err := recover(); err != nil {
+// Recovery print input err value.
+// If err is nil, we will try to call recover() to fetch value.
+func Recovery(err interface{}, options ...zap.Option) {
+	if err == nil {
+		err = recover()
+	}
+	RecoveryWithContext(nil, err, options...)
+}
+
+// RecoveryWithContext print input err value with context's logger.
+// If err is nil, we will try to call recover() to fetch value.
+func RecoveryWithContext(ctx context.Context, err interface{}, options ...zap.Option) {
+	if err == nil {
+		err = recover()
+	}
+	if err != nil {
 		stack := Stack(3)
 		log.Logger(ctx).WithOptions(options...).Error("panic recovered",
 			zap.String("stack", string(stack)),

@@ -15,6 +15,21 @@ func TestRecovery(t *testing.T) {
 	panic("testing")
 }
 
+func TestRecoveryWithContext(t *testing.T) {
+	// Can take nil context
+	defer RecoveryWithContext(nil, nil)
+	panic("testing")
+}
+
+func TestRecovery2(t *testing.T) {
+	defer func() {
+		err := recover()
+		Recovery(err)
+		assert.NotNil(t, err)
+	}()
+	panic("testing")
+}
+
 func TestStack(t *testing.T) {
 	result := Stack(1)
 	assert.Contains(t, string(result), "go-hybrid/builtinutil/recover_test.go")
