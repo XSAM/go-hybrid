@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/XSAM/go-hybrid/trace"
 )
@@ -25,5 +24,11 @@ func TestPlainRender(t *testing.T) {
 		WithWrap("test").
 		WithWrap("test2")
 
-	assert.Equal(t, "test2: test: foo. traceID: trace_id. fields: foo:bar struct_field:{Foo:foo Bar:[bar1 bar2]}", PlainRender(err))
+	expectedResult1 := "test2: test: foo. traceID: trace_id. fields: foo:bar struct_field:{Foo:foo Bar:[bar1 bar2]}"
+	expectedResult2 := "test2: test: foo. traceID: trace_id. fields: struct_field:{Foo:foo Bar:[bar1 bar2]} foo:bar"
+	result := PlainRender(err)
+
+	if result != expectedResult1 && result != expectedResult2 {
+		t.Fatal("unexpected result")
+	}
 }
