@@ -7,6 +7,6 @@ import (
 )
 
 func WrappedGo(ctx context.Context, callback func(), options ...zap.Option) {
-	defer Recovery(ctx, options...)
+	defer RecoveryWithContext(ctx, nil, options...)
 	callback()
 }
