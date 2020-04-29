@@ -1,7 +1,6 @@
 package errorw
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -9,8 +8,6 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
-
-	"github.com/XSAM/go-hybrid/trace"
 )
 
 func TestError_MarshalLogObject(t *testing.T) {
@@ -28,7 +25,7 @@ func TestError_MarshalLogObject(t *testing.T) {
 		"foo":    "bar",
 		"struct": testStruct{Value: "value"},
 	}, err["fields"])
-	assert.Contains(t, err["stack"], "go-hybrid/errorw/stack_test.go:12")
+	assert.Contains(t, err["stack"], "go-hybrid/errorw/stack_test.go:11")
 }
 
 func TestError_MarshalLogObject2(t *testing.T) {
@@ -36,7 +33,7 @@ func TestError_MarshalLogObject2(t *testing.T) {
 	logger := zap.New(ob)
 
 	// Set trace id
-	e := New(trace.SetTraceIDToContext(context.Background(), "trace_id"), errors.New("testing error")).WithWrap("wrap")
+	e := New(errors.New("testing error")).WithWrap("wrap").WithTraceID("trace_id")
 	// Set cause error is nil
 	e.Err = nil
 
@@ -47,4 +44,5 @@ func TestError_MarshalLogObject2(t *testing.T) {
 	err := contextMap["error"].(map[string]interface{})
 	assert.Equal(t, "test", log.Message)
 	assert.Equal(t, "wrap: nil", err["msg"])
+	assert.Equal(t, "trace_id", err["trace_id"])
 }

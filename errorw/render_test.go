@@ -1,11 +1,8 @@
 package errorw
 
 import (
-	"context"
 	"errors"
 	"testing"
-
-	"github.com/XSAM/go-hybrid/trace"
 )
 
 func TestPlainRender(t *testing.T) {
@@ -17,11 +14,12 @@ func TestPlainRender(t *testing.T) {
 		Bar: []string{"bar1", "bar2"},
 	}
 
-	err := New(trace.SetTraceIDToContext(context.Background(), "trace_id"), errors.New("foo"))
+	err := New(errors.New("foo"))
 	err = err.WithField("foo", "bar").
 		WithField("struct_field", structField).
 		WithWrap("test").
-		WithWrap("test2")
+		WithWrap("test2").
+		WithTraceID("trace_id")
 
 	expectedResult1 := "test2: test: foo. traceID: trace_id. fields: foo:bar struct_field:{Foo:foo Bar:[bar1 bar2]}"
 	expectedResult2 := "test2: test: foo. traceID: trace_id. fields: struct_field:{Foo:foo Bar:[bar1 bar2]} foo:bar"

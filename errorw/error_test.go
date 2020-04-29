@@ -1,7 +1,6 @@
 package errorw
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"testing"
@@ -9,8 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/XSAM/go-hybrid/trace"
 )
 
 func TestNew(t *testing.T) {
@@ -18,36 +15,25 @@ func TestNew(t *testing.T) {
 
 	testCases := []struct {
 		name string
-		ctx  context.Context
 		err  error
 	}{
 		{
-			name: "context is nil, error is nil",
+			name: "error is nil",
 		},
 		{
-			name: "context is not nil, error is nil",
-			ctx:  context.Background(),
-		},
-		{
-			name: "context and error not nil",
-			ctx:  context.Background(),
-		},
-		{
-			name: "context with trace id",
-			ctx:  trace.SetTraceIDToContext(context.Background(), "trace_id"),
+			name: "err is not nil",
 			err:  tcErr,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := New(tc.ctx, tc.err)
+			err := New(tc.err)
 
 			if tc.err == nil {
 				assert.Nil(t, err)
 			} else {
 				assert.NotNil(t, err)
-				assert.Equal(t, trace.GetTraceIDFromContext(tc.ctx), err.TraceID)
 				assert.NotNil(t, err.Stack)
 			}
 		})
@@ -64,7 +50,7 @@ func TestWrap(t *testing.T) {
 		},
 		{
 			name: "error type is errorw.Error",
-			err:  New(context.Background(), errors.New("testing")),
+			err:  New(errors.New("testing")),
 		},
 		{
 			name: "error type is not errorw.Error",
@@ -98,17 +84,18 @@ func TestWrap2(t *testing.T) {
 }
 
 func TestError_Error(t *testing.T) {
-	err := New(trace.SetTraceIDToContext(context.Background(), "trace_id"), errors.New("foo"))
+	err := New(errors.New("foo"))
 	err = err.WithField("foo", "bar").
 		WithWrap("test").
-		WithWrap("test2")
+		WithWrap("test2").
+		WithTraceID("trace_id")
 
 	assert.Equal(t, "test2: test: foo. traceID: trace_id. fields: foo:bar", err.Error())
 }
 
 func TestError_Cause(t *testing.T) {
 	err := errors.New("foo")
-	e := New(context.Background(), err)
+	e := New(err)
 
 	assert.Equal(t, err, e.Cause())
 }
@@ -127,7 +114,7 @@ func TestError_APIErrorCause(t *testing.T) {
 }
 
 func TestError_WithAPIError(t *testing.T) {
-	err := New(context.Background(), errors.New("foo")).
+	err := New(errors.New("foo")).
 		WithAPIError(status.New(codes.Internal, "foo")).
 		WithAPIError(status.New(codes.Internal, "bar"))
 
@@ -135,7 +122,7 @@ func TestError_WithAPIError(t *testing.T) {
 }
 
 func TestError_WithField(t *testing.T) {
-	err := New(context.Background(), errors.New("foo")).
+	err := New(errors.New("foo")).
 		WithField("foo", "foo").
 		WithField("bar", "bar")
 
@@ -146,7 +133,7 @@ func TestError_WithField(t *testing.T) {
 }
 
 func TestError_WithFields(t *testing.T) {
-	err := New(context.Background(), errors.New("foo")).WithFields(map[string]interface{}{
+	err := New(errors.New("foo")).WithFields(map[string]interface{}{
 		"foo": "foo",
 		"bar": "bar",
 	}).WithFields(map[string]interface{}{
@@ -162,17 +149,30 @@ func TestError_WithFields(t *testing.T) {
 }
 
 func TestError_WithWrap(t *testing.T) {
-	err := New(context.Background(), errors.New("foo")).
+	err := New(errors.New("foo")).
 		WithWrap("foo").WithWrap("bar")
 
 	assert.Equal(t, []string{"foo", "bar"}, err.Wrapper)
+}
+
+func TestError_WithTraceID(t *testing.T) {
+	err := NewMessage("foo").WithTraceID("id")
+
+	assert.Equal(t, "foo. traceID: id", err.Error())
+	assert.Equal(t, "id", err.TraceID)
+}
+
+func TestNewMessage(t *testing.T) {
+	err := NewMessage("foo")
+
+	assert.Equal(t, "foo", err.Error())
 }
 
 func TestNewMessagef(t *testing.T) {
 	format := "%s: %d"
 	args := []interface{}{"foo", 42}
 
-	err := NewMessagef(context.Background(), format, args...)
+	err := NewMessagef(format, args...)
 
 	assert.Equal(t, fmt.Sprintf(format, args...), err.Error())
 }

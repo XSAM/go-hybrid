@@ -1,15 +1,12 @@
 package errorw
 
 import (
-	"context"
 	"errors"
 	"fmt"
 
 	pkgerrors "github.com/pkg/errors"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc/status"
-
-	"github.com/XSAM/go-hybrid/trace"
 )
 
 // Error wrap error with fields and stack
@@ -85,18 +82,23 @@ func (e *Error) WithWrap(message string) *Error {
 	return e
 }
 
-// New a error
-func New(ctx context.Context, err error) *Error {
-	return newError(ctx, err, 4)
+// WithWrap set trace id to error
+func (e *Error) WithTraceID(traceID string) *Error {
+	e.TraceID = traceID
+	return e
 }
 
-func newError(ctx context.Context, err error, skip int) *Error {
+// New a error
+func New(err error) *Error {
+	return newError(err, 4)
+}
+
+func newError(err error, skip int) *Error {
 	if err == nil {
 		return nil
 	}
 
 	return &Error{
-		TraceID: trace.GetTraceIDFromContext(ctx),
 		Err:     err,
 		Stack:   callers(skip),
 	}
@@ -111,13 +113,13 @@ func Wrap(err error, message string) *Error {
 	if val, ok := err.(*Error); ok {
 		return val.WithWrap(message)
 	}
-	return New(context.Background(), err).WithWrap(message)
+	return New(err).WithWrap(message)
 }
 
-func NewMessage(ctx context.Context, message string) *Error {
-	return newError(ctx, errors.New(message), 4)
+func NewMessage(message string) *Error {
+	return newError(errors.New(message), 4)
 }
 
-func NewMessagef(ctx context.Context, format string, args ...interface{}) *Error {
-	return newError(ctx, fmt.Errorf(format, args...), 4)
+func NewMessagef(format string, args ...interface{}) *Error {
+	return newError(fmt.Errorf(format, args...), 4)
 }

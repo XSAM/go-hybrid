@@ -1,7 +1,6 @@
 package errorw
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"regexp"
@@ -9,12 +8,12 @@ import (
 	"testing"
 )
 
-var e = NewMessage(context.Background(), "testing error").
+var e = NewMessage("testing error").
 	WithField("foo", "bar").
 	WithField("struct", testStruct{Value: "value"}).
 	WithWrap("wrap")
 
-var e2 = New(context.Background(), errors.New("testing error"))
+var e2 = New(errors.New("testing error"))
 
 type testStruct struct {
 	Value string
@@ -25,7 +24,7 @@ func TestError_StackTrace(t *testing.T) {
 	st := e.StackTrace()
 
 	want := []string{
-		"github.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:12",
+		"github.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:11",
 	}
 	for i, w := range want {
 		testFormatRegexp(t, i, st[i], "%+v", w)
@@ -35,7 +34,7 @@ func TestError_StackTrace(t *testing.T) {
 	st = e2.StackTrace()
 
 	want = []string{
-		"github.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:17",
+		"github.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:16",
 	}
 	for i, w := range want {
 		testFormatRegexp(t, i, st[i], "%+v", w)
@@ -57,7 +56,7 @@ func TestStack_Format(t *testing.T) {
 		},
 		{
 			format: "%+v",
-			want:   "\ngithub.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:12",
+			want:   "\ngithub.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:11",
 		},
 	}
 
