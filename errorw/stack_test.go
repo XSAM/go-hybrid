@@ -1,6 +1,7 @@
 package errorw
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"strings"
@@ -9,13 +10,20 @@ import (
 	"github.com/pkg/errors"
 )
 
-var e = New(nil, errors.New("testing error")).WithField("foo", "bar").WithWrap("wrap")
+var e = New(context.Background(), errors.New("testing error")).
+	WithField("foo", "bar").
+	WithField("struct", testStruct{Value: "value"}).
+	WithWrap("wrap")
+
+type testStruct struct {
+	Value string
+}
 
 func TestError_StackTrace(t *testing.T) {
 	st := e.StackTrace()
 
 	want := []string{
-		"github.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:12",
+		"github.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:13",
 	}
 	for i, w := range want {
 		testFormatRegexp(t, i, st[i], "%+v", w)
@@ -37,7 +45,7 @@ func TestStack_Format(t *testing.T) {
 		},
 		{
 			format: "%+v",
-			want:   "\ngithub.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:12",
+			want:   "\ngithub.com/XSAM/go-hybrid/errorw.init\n\t.*go-hybrid/errorw/stack_test.go:13",
 		},
 	}
 

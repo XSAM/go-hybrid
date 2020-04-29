@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
@@ -30,8 +31,9 @@ func (e *Error) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddString("stack", fmt.Sprintf("%+v", e.Stack))
 
 	// Fields
-	if e.Fields != nil {
-		enc.AddReflected("fields", e.Fields)
+	if len(e.Fields) > 0 {
+		field := zap.Any("fields", e.Fields)
+		field.AddTo(enc)
 	}
 	return nil
 }

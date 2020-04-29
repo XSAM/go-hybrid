@@ -101,5 +101,5 @@ func Wrap(err error, message string) *Error {
 	if val, ok := err.(*Error); ok {
 		return val.WithWrap(message)
 	}
-	return New(nil, err).WithWrap(message)
+	return New(context.Background(), err).WithWrap(message)
 }

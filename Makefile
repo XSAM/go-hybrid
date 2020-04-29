@@ -24,7 +24,15 @@ build:
 	go build -o bin/example ${FLAGS} _example/main.go
 
 test:
-	@echo "> Run unit test"
+	@echo "> Running unit test"
 	@go test -gcflags=-l -coverprofile coverage.out ./...
 	@echo "> Total coverage"
 	@go tool cover -func coverage.out | grep total
+
+install-tool:
+	@echo "> Installing tools"
+	GO111MODULE=off go get github.com/golangci/golangci-lint/cmd/golangci-lint
+
+check:
+	@echo "> Examining Go source code and reports suspicious constructs"
+	golangci-lint run

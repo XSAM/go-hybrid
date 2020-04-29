@@ -25,7 +25,7 @@ func Recovery(err interface{}, options ...zap.Option) {
 	if err == nil {
 		err = recover()
 	}
-	RecoveryWithContext(nil, err, options...)
+	RecoveryWithContext(context.Background(), err, options...)
 }
 
 // RecoveryWithContext print input err value with context's logger.
