@@ -51,7 +51,10 @@ func rootCmd() *cobra.Command {
 	flag = Flag{
 		Number: 42,
 	}
-	cmdutil.ResolveFlagVariable(&cmd, &flag)
+	err := cmdutil.ResolveFlagVariable(&cmd, &flag)
+	if err != nil {
+		log.BgLogger().Fatal("resolve flag", zapfield.Error(err))
+	}
 
 	return &cmd
 }
