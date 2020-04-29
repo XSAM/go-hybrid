@@ -3,7 +3,6 @@ package runtime
 import (
 	"context"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
@@ -90,7 +89,7 @@ func logCmd() *cobra.Command {
 
 			// Print errorw
 			log.BgLogger().Info("-- print errorw --")
-			err := errorw.New(context.Background(), errors.New("error cause")).
+			err := errorw.NewMessage(context.Background(), "error cause").
 				WithField("key", "value").
 				WithWrap("wrap1").
 				WithWrap("wrap2")

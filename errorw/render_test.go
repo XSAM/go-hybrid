@@ -2,9 +2,8 @@ package errorw
 
 import (
 	"context"
+	"errors"
 	"testing"
-
-	"github.com/pkg/errors"
 
 	"github.com/XSAM/go-hybrid/trace"
 )

@@ -2,10 +2,12 @@ package errorw
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
+	pkgerrors "github.com/pkg/errors"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc/status"
-	"gopkg.in/errgo.v2/errors"
 
 	"github.com/XSAM/go-hybrid/trace"
 )
@@ -21,10 +23,14 @@ type Error struct {
 	APIErrors []*status.Status
 }
 
+type causer interface {
+	Cause() error
+}
+
 // Verify interface compliance at compile time
 var _ error = (*Error)(nil)
 var _ stackTracer = (*Error)(nil)
-var _ errors.Causer = (*Error)(nil)
+var _ causer = (*Error)(nil)
 var _ zapcore.ObjectMarshaler = (*Error)(nil)
 
 func (e *Error) Error() string {
@@ -33,7 +39,7 @@ func (e *Error) Error() string {
 
 // Cause implement errors.Cause interface
 func (e *Error) Cause() error {
-	return errors.Cause(e.Err)
+	return pkgerrors.Cause(e.Err)
 }
 
 // APIErrorCause return the root cause of the API error.
@@ -81,6 +87,10 @@ func (e *Error) WithWrap(message string) *Error {
 
 // New a error
 func New(ctx context.Context, err error) *Error {
+	return newError(ctx, err, 4)
+}
+
+func newError(ctx context.Context, err error, skip int) *Error {
 	if err == nil {
 		return nil
 	}
@@ -88,7 +98,7 @@ func New(ctx context.Context, err error) *Error {
 	return &Error{
 		TraceID: trace.GetTraceIDFromContext(ctx),
 		Err:     err,
-		Stack:   callers(),
+		Stack:   callers(skip),
 	}
 }
 
@@ -102,4 +112,12 @@ func Wrap(err error, message string) *Error {
 		return val.WithWrap(message)
 	}
 	return New(context.Background(), err).WithWrap(message)
+}
+
+func NewMessage(ctx context.Context, message string) *Error {
+	return newError(ctx, errors.New(message), 4)
+}
+
+func NewMessagef(ctx context.Context, format string, args ...interface{}) *Error {
+	return newError(ctx, fmt.Errorf(format, args...), 4)
 }
