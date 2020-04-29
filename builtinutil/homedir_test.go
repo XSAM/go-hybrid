@@ -30,7 +30,8 @@ func TestUserHomeDir(t *testing.T) {
 					return "", errors.New("testing")
 				})
 				defer func() {
-					recover()
+					err := recover()
+					assert.NotNil(t, err)
 				}()
 			}
 			result := UserHomeDir()

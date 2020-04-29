@@ -1,6 +1,7 @@
 package builtinutil
 
 import (
+	"context"
 	"errors"
 	"io/ioutil"
 	"testing"
@@ -17,7 +18,8 @@ func TestRecovery(t *testing.T) {
 
 func TestRecoveryWithContext(t *testing.T) {
 	// Can take nil context
-	defer RecoveryWithContext(nil, nil)
+	var ctx context.Context
+	defer RecoveryWithContext(ctx, nil)
 	panic("testing")
 }
 

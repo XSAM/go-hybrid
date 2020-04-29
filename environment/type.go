@@ -4,13 +4,13 @@ type ModeType string
 
 const (
 	ModeProduction  ModeType = "production"
-	ModeStaging              = "staging"
-	ModeDevelopment          = "development"
+	ModeStaging     ModeType = "staging"
+	ModeDevelopment ModeType = "development"
 )
 
 type LogStyleType string
 
 const (
 	LogStyleJSON LogStyleType = "json"
-	LogStyleText              = "text"
+	LogStyleText LogStyleType = "text"
 )

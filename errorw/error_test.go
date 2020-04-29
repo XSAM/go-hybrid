@@ -63,7 +63,7 @@ func TestWrap(t *testing.T) {
 		},
 		{
 			name: "error type is errorw.Error",
-			err:  New(nil, errors.New("testing")),
+			err:  New(context.Background(), errors.New("testing")),
 		},
 		{
 			name: "error type is not errorw.Error",
@@ -107,7 +107,7 @@ func TestError_Error(t *testing.T) {
 
 func TestError_Cause(t *testing.T) {
 	err := errors.New("foo")
-	e := New(nil, err)
+	e := New(context.Background(), err)
 
 	assert.Equal(t, err, e.Cause())
 }
@@ -126,7 +126,7 @@ func TestError_APIErrorCause(t *testing.T) {
 }
 
 func TestError_WithAPIError(t *testing.T) {
-	err := New(nil, errors.New("foo")).
+	err := New(context.Background(), errors.New("foo")).
 		WithAPIError(status.New(codes.Internal, "foo")).
 		WithAPIError(status.New(codes.Internal, "bar"))
 
@@ -134,7 +134,7 @@ func TestError_WithAPIError(t *testing.T) {
 }
 
 func TestError_WithField(t *testing.T) {
-	err := New(nil, errors.New("foo")).
+	err := New(context.Background(), errors.New("foo")).
 		WithField("foo", "foo").
 		WithField("bar", "bar")
 
@@ -145,7 +145,7 @@ func TestError_WithField(t *testing.T) {
 }
 
 func TestError_WithFields(t *testing.T) {
-	err := New(nil, errors.New("foo")).WithFields(map[string]interface{}{
+	err := New(context.Background(), errors.New("foo")).WithFields(map[string]interface{}{
 		"foo": "foo",
 		"bar": "bar",
 	}).WithFields(map[string]interface{}{
@@ -161,7 +161,7 @@ func TestError_WithFields(t *testing.T) {
 }
 
 func TestError_WithWrap(t *testing.T) {
-	err := New(nil, errors.New("foo")).
+	err := New(context.Background(), errors.New("foo")).
 		WithWrap("foo").WithWrap("bar")
 
 	assert.Equal(t, []string{"foo", "bar"}, err.Wrapper)

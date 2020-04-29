@@ -25,9 +25,10 @@ func TestError_MarshalLogObject(t *testing.T) {
 	assert.Equal(t, "test", log.Message)
 	assert.Equal(t, "wrap: testing error", err["msg"])
 	assert.Equal(t, map[string]interface{}{
-		"foo": "bar",
+		"foo":    "bar",
+		"struct": testStruct{Value: "value"},
 	}, err["fields"])
-	assert.Contains(t, err["stack"], "go-hybrid/errorw/stack_test.go:12")
+	assert.Contains(t, err["stack"], "go-hybrid/errorw/stack_test.go:13")
 }
 
 func TestError_MarshalLogObject2(t *testing.T) {

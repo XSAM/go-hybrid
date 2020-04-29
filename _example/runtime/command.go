@@ -90,7 +90,7 @@ func logCmd() *cobra.Command {
 
 			// Print errorw
 			log.BgLogger().Info("-- print errorw --")
-			err := errorw.New(nil, errors.New("error cause")).
+			err := errorw.New(context.Background(), errors.New("error cause")).
 				WithField("key", "value").
 				WithWrap("wrap1").
 				WithWrap("wrap2")
