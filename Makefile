@@ -25,6 +25,6 @@ build:
 
 test:
 	@echo "> Run unit test"
-	@go test -gcflags=-l -coverprofile cover.out ./...
+	@go test -gcflags=-l -coverprofile coverage.out ./...
 	@echo "> Total coverage"
-	@go tool cover -func cover.out | grep total
+	@go tool cover -func coverage.out | grep total
