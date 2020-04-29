@@ -1,0 +1,77 @@
+name: test & build
+on: [push, pull_request]
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.14.2
+        uses: actions/setup-go@master
+        with:
+          go-version: 1.14.2
+      - name: Checkout code
+        uses: actions/checkout@v1
+      - name: Install golangci-lint
+        run: |
+          go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.25.1
+      - name: Run linter
+        run: |
+          golangci-lint
+
+  test:
+    strategy:
+      matrix:
+        go-version: [1.12.x, 1.13.x, 1.14.x]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@master
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v1
+      - name: Run test
+        run: |
+          make test
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.14.2
+        uses: actions/setup-go@master
+        with:
+          go-version: 1.14.2
+      - name: Checkout code
+        uses: actions/checkout@v1
+      - name: Run test
+        run: |
+          make test
+      - name: Convert coverage to lcov
+        uses: jandelgado/gcov2lcov-action@v1.0.0
+        with:
+          infile: coverage.out
+          outfile: coverage.lcov
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: coverage.lcov
+
+  build:
+    needs: [lint, test]
+    strategy:
+      matrix:
+        go-version: [1.12.x, 1.13.x, 1.14.x]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@master
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v1
+      - name: Build
+        run: |
+          make
