@@ -1,7 +1,6 @@
 package zapfield
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"testing"
@@ -31,7 +30,7 @@ func TestError(t *testing.T) {
 	logger, logs := newObservedLogger()
 
 	normalError := errors.New("error")
-	errorwError := errorw.New(context.Background(), normalError)
+	errorwError := errorw.New(normalError)
 
 	testCases := []struct {
 		mode        environment.ModeType
