@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
+	"github.com/XSAM/go-hybrid/errorw"
 )
 
 type flags []flag
@@ -171,10 +173,10 @@ func genEnv(name string) string {
 }
 
 // ResolveFlagVariable register persistent flags and env via tags in struct
-func ResolveFlagVariable(cmd *cobra.Command, f interface{}) {
+func ResolveFlagVariable(cmd *cobra.Command, f interface{}) (err error) {
 	t := reflect.TypeOf(f)
 	if t.Kind() != reflect.Ptr {
-		panic("flag variable require pointer type")
+		return errorw.NewMessage("flag variable require pointer type")
 	}
 
 	var flags flags
@@ -184,7 +186,7 @@ func ResolveFlagVariable(cmd *cobra.Command, f interface{}) {
 	set := make(map[string]struct{})
 	for _, v := range flags {
 		if _, ok := set[v.FullName]; ok {
-			panic(fmt.Sprintf("duplicated flag full name: %s", v.FullName))
+			return errorw.NewMessagef("duplicated flag full name: %s", v.FullName)
 		} else {
 			set[v.FullName] = struct{}{}
 		}
@@ -210,11 +212,20 @@ func ResolveFlagVariable(cmd *cobra.Command, f interface{}) {
 		case "string-to-int":
 			cmd.PersistentFlags().StringToIntVarP(v.Pointer.(*map[string]int), v.FullName, v.Shorthand, v.Value.(map[string]int), v.Usage)
 		default:
-			panic(fmt.Sprintf("not supported flag type: %s", v.Type))
+			return errorw.NewMessagef("not supported flag type: %s", v.Type)
 		}
 	}
 
 	// Register env
+	err = registerEnv(cmd, flags)
+	if err != nil {
+		return errorw.Wrap(err, "register env value")
+	}
+	return nil
+}
+
+// Register env
+func registerEnv(cmd *cobra.Command, flags flags) error {
 	for _, v := range flags {
 		if !v.EnableEnv {
 			continue
@@ -232,12 +243,24 @@ func ResolveFlagVariable(cmd *cobra.Command, f interface{}) {
 			if v.EnvSplit != "" {
 				strings.Split(value, v.EnvSplit)
 
-				for _, v := range strings.Split(value, v.EnvSplit) {
-					f.Value.Set(v)
+				for _, value := range strings.Split(value, v.EnvSplit) {
+					err := f.Value.Set(value)
+					if err != nil {
+						return errorw.Wrap(err, "set env value with delimiter").
+							WithField("name", v.FullName).
+							WithField("value", value).
+							WithField("delimiter", v.EnvSplit)
+					}
 				}
 			} else {
-				f.Value.Set(value)
+				err := f.Value.Set(value)
+				if err != nil {
+					return errorw.Wrap(err, "set env value").
+						WithField("name", v.FullName).
+						WithField("value", value)
+				}
 			}
 		}
 	}
+	return nil
 }

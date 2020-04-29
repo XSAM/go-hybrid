@@ -71,9 +71,10 @@ type TestInline struct {
 
 func Test_resolveFlags(t *testing.T) {
 	f := testFlag{
-		String: "normal",
-		Array:  []string{"foo"},
-		Map:    map[string]string{"foo": "bar"},
+		String:  "normal",
+		Array:   []string{"foo"},
+		Map:     map[string]string{"foo": "bar"},
+		ignore3: "",
 	}
 
 	var result flags
@@ -108,7 +109,8 @@ func Test_resolveFlags(t *testing.T) {
 	}, result)
 
 	// Can be registered
-	ResolveFlagVariable(&cobra.Command{}, &f)
+	err := ResolveFlagVariable(&cobra.Command{}, &f)
+	assert.NoError(t, err)
 }
 
 func Test_toSnake(t *testing.T) {
@@ -247,21 +249,22 @@ func Test_resolveCobraType(t *testing.T) {
 }
 
 func TestResolveFlagVariableWithInvalid(t *testing.T) {
+	var err error
 	// Require pointer type
 	m := struct {
 		Name string
 	}{}
-	assert.PanicsWithValue(t, "flag variable require pointer type", func() {
-		ResolveFlagVariable(nil, m)
-	})
+	err = ResolveFlagVariable(nil, m)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "flag variable require pointer type")
 
 	// Not supported type
 	n := struct {
 		M map[int]string `flag:""`
 	}{}
-	assert.PanicsWithValue(t, "not supported flag type: int-to-string", func() {
-		ResolveFlagVariable(nil, &n)
-	})
+	err = ResolveFlagVariable(nil, &n)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "not supported flag type: int-to-string")
 }
 
 func TestResolveFlagVariableWithEnv(t *testing.T) {
@@ -292,8 +295,9 @@ func TestResolveFlagVariableWithEnv(t *testing.T) {
 		Slice3: []int{1, 2},
 	}
 
-	ResolveFlagVariable(&cobra.Command{}, &m)
+	err := ResolveFlagVariable(&cobra.Command{}, &m)
 
+	assert.NoError(t, err)
 	assert.Equal(t, "value", m.Name)
 	assert.Equal(t, []string{"foo", "bar"}, m.Slice)
 	assert.Equal(t, []string{"foo", "bar"}, m.Slice2)
@@ -319,7 +323,9 @@ func TestResolveFlagVariableWithEnvAndUsage(t *testing.T) {
 	}{}
 
 	cmd := cobra.Command{}
-	ResolveFlagVariable(&cmd, &m)
+	err := ResolveFlagVariable(&cmd, &m)
+
+	assert.NoError(t, err)
 
 	assert.Equal(t, "[env NAME]", cmd.Flag("name").Usage)
 	assert.Equal(t, "value2", m.Name)
@@ -336,8 +342,9 @@ func TestResolveFlagVariableWithDefaultValue(t *testing.T) {
 	}
 
 	cmd := cobra.Command{}
-	ResolveFlagVariable(&cmd, &m)
+	err := ResolveFlagVariable(&cmd, &m)
 
+	assert.NoError(t, err)
 	assert.Equal(t, "foo", cmd.Flag("name").Value.String())
 }
 
@@ -348,9 +355,9 @@ func TestResolveFlagVariableWithConflictedName(t *testing.T) {
 	}{}
 
 	cmd := cobra.Command{}
-	assert.PanicsWithValue(t, "duplicated flag full name: name", func() {
-		ResolveFlagVariable(&cmd, &m)
-	})
+	err := ResolveFlagVariable(&cmd, &m)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "duplicated flag full name")
 }
 
 func Test_resolveFlagsDepth(t *testing.T) {
@@ -371,7 +378,8 @@ func Test_resolveFlagsDepth(t *testing.T) {
 	}{}
 
 	cmd := cobra.Command{}
-	ResolveFlagVariable(&cmd, &m)
+	err := ResolveFlagVariable(&cmd, &m)
+	assert.NoError(t, err)
 
 	var flags []*pflag.Flag
 	cmd.PersistentFlags().VisitAll(func(flag *pflag.Flag) {
@@ -379,4 +387,46 @@ func Test_resolveFlagsDepth(t *testing.T) {
 	})
 
 	assert.Len(t, flags, 2)
+}
+
+func TestResolveFlagVariableWithWrongEnv(t *testing.T) {
+	// Monkey patch
+	monkey.Patch(os.Getenv, func(key string) string {
+		switch key {
+		case "INT":
+			return "value"
+		}
+		return ""
+	})
+	defer monkey.Unpatch(os.Getenv)
+
+	m := struct {
+		Int int `flag:"env"`
+	}{}
+
+	err := ResolveFlagVariable(&cobra.Command{}, &m)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "set env value")
+}
+
+func TestResolveFlagVariableWithWrongEnvSplit(t *testing.T) {
+	// Monkey patch
+	monkey.Patch(os.Getenv, func(key string) string {
+		switch key {
+		case "SLICE":
+			return "value;value"
+		}
+		return ""
+	})
+	defer monkey.Unpatch(os.Getenv)
+
+	m := struct {
+		Slice []int `flag:"env env-split=;"`
+	}{}
+
+	err := ResolveFlagVariable(&cobra.Command{}, &m)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "set env value with delimiter")
 }
