@@ -28,7 +28,7 @@ func TestError_MarshalLogObject(t *testing.T) {
 		"foo":    "bar",
 		"struct": testStruct{Value: "value"},
 	}, err["fields"])
-	assert.Contains(t, err["stack"], "go-hybrid/errorw/stack_test.go:13")
+	assert.Contains(t, err["stack"], "go-hybrid/errorw/stack_test.go:12")
 }
 
 func TestError_MarshalLogObject2(t *testing.T) {

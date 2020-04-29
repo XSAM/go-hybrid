@@ -2,9 +2,10 @@ package errorw
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -165,4 +166,13 @@ func TestError_WithWrap(t *testing.T) {
 		WithWrap("foo").WithWrap("bar")
 
 	assert.Equal(t, []string{"foo", "bar"}, err.Wrapper)
+}
+
+func TestNewMessagef(t *testing.T) {
+	format := "%s: %d"
+	args := []interface{}{"foo", 42}
+
+	err := NewMessagef(context.Background(), format, args...)
+
+	assert.Equal(t, fmt.Sprintf(format, args...), err.Error())
 }
