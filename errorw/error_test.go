@@ -113,6 +113,19 @@ func TestError_APIErrorCause(t *testing.T) {
 	assert.Nil(t, err.APIErrorCause())
 }
 
+func TestError_GRPCStatus(t *testing.T) {
+	// Have value
+	err := &Error{APIErrors: []*status.Status{
+		status.New(codes.Internal, "foo"),
+		status.New(codes.Internal, "bar"),
+	}}
+	assert.Equal(t, "foo", err.GRPCStatus().Message())
+
+	// Empty
+	err = &Error{}
+	assert.Nil(t, err.GRPCStatus())
+}
+
 func TestError_WithAPIError(t *testing.T) {
 	err := New(errors.New("foo")).
 		WithAPIError(status.New(codes.Internal, "foo")).

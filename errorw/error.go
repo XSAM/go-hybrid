@@ -29,6 +29,7 @@ var _ error = (*Error)(nil)
 var _ stackTracer = (*Error)(nil)
 var _ causer = (*Error)(nil)
 var _ zapcore.ObjectMarshaler = (*Error)(nil)
+var _ interface{ GRPCStatus() *status.Status } = (*Error)(nil)
 
 func (e *Error) Error() string {
 	return Render(e)
@@ -45,6 +46,12 @@ func (e *Error) APIErrorCause() *status.Status {
 		return e.APIErrors[0]
 	}
 	return nil
+}
+
+// APIErrorCause return the root cause of the API error.
+// Implement gRPC status.GRPCStatus function.
+func (e *Error) GRPCStatus() *status.Status {
+	return e.APIErrorCause()
 }
 
 // WithAPIError append API error to error
@@ -99,8 +106,8 @@ func newError(err error, skip int) *Error {
 	}
 
 	return &Error{
-		Err:     err,
-		Stack:   callers(skip),
+		Err:   err,
+		Stack: callers(skip),
 	}
 }
 
