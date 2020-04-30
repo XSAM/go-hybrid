@@ -114,16 +114,47 @@ func TestError_APIErrorCause(t *testing.T) {
 }
 
 func TestError_GRPCStatus(t *testing.T) {
-	// Have value
-	err := &Error{APIErrors: []*status.Status{
-		status.New(codes.Internal, "foo"),
-		status.New(codes.Internal, "bar"),
-	}}
-	assert.Equal(t, "foo", err.GRPCStatus().Message())
+	testCases := []struct {
+		name               string
+		err                *Error
+		expectedGRPCStatus *status.Status
+	}{
+		{
+			name: "have API error",
+			err: &Error{APIErrors: []*status.Status{
+				status.New(codes.Internal, "foo"),
+				status.New(codes.Internal, "bar"),
+			}},
+			expectedGRPCStatus: status.New(codes.Internal, "foo"),
+		},
+		{
+			name:               "empty",
+			err:                &Error{},
+			expectedGRPCStatus: nil,
+		},
+		{
+			name:               "internal err implement gRPC status.GRPCStatus",
+			err:                &Error{Err: status.New(codes.Internal, "root").Err()},
+			expectedGRPCStatus: status.New(codes.Internal, "root"),
+		},
+		{
+			name: "internal err implement gRPC status.GRPCStatus. Error also contain API error",
+			err: &Error{
+				Err: status.New(codes.Internal, "root").Err(),
+				APIErrors: []*status.Status{
+					status.New(codes.Internal, "foo"),
+					status.New(codes.Internal, "bar"),
+				}},
+			expectedGRPCStatus: status.New(codes.Internal, "root"),
+		},
+	}
 
-	// Empty
-	err = &Error{}
-	assert.Nil(t, err.GRPCStatus())
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := tc.err.GRPCStatus()
+			assert.Equal(t, tc.expectedGRPCStatus, result)
+		})
+	}
 }
 
 func TestError_WithAPIError(t *testing.T) {
