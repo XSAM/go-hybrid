@@ -189,3 +189,15 @@ func TestNewMessagef(t *testing.T) {
 
 	assert.Equal(t, fmt.Sprintf(format, args...), err.Error())
 }
+
+func TestNewAPIError(t *testing.T) {
+	apiErr := status.New(codes.Internal, "test")
+	err := NewAPIError(apiErr)
+
+	assert.Error(t, err)
+	assert.Equal(t, "test", err.Err.Error())
+	assert.Equal(t, "test", err.Error())
+	assert.Len(t, err.APIErrors, 1)
+	assert.Equal(t, apiErr, err.APIErrorCause())
+	assert.Equal(t, apiErr, err.GRPCStatus())
+}

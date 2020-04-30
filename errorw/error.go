@@ -95,7 +95,7 @@ func (e *Error) WithTraceID(traceID string) *Error {
 	return e
 }
 
-// New a error
+// New create an error
 func New(err error) *Error {
 	return newError(err, 4)
 }
@@ -123,10 +123,19 @@ func Wrap(err error, message string) *Error {
 	return New(err).WithWrap(message)
 }
 
+// NewMessage create an error with message.
 func NewMessage(message string) *Error {
 	return newError(errors.New(message), 4)
 }
 
+// NewMessagef create an error with message.
+// It will formats according to a format specifier and returns the resulting string.
 func NewMessagef(format string, args ...interface{}) *Error {
 	return newError(fmt.Errorf(format, args...), 4)
+}
+
+// NewAPIError create an error and append API error.
+func NewAPIError(apiError *status.Status) *Error {
+	return newError(errors.New(apiError.Message()), 4).
+		WithAPIError(apiError)
 }
