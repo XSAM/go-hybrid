@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/XSAM/go-hybrid)](https://goreportcard.com/report/github.com/XSAM/go-hybrid)
 [![Documentation](https://godoc.org/github.com/XSAM/go-hybrid?status.svg)](https://pkg.go.dev/mod/github.com/XSAM/go-hybrid)
 
-This repository provides common utility packages for Golang. Such as `log` and `error` and `cmdutil` lib.
+This repository provides common utility packages for Golang. Such as `log`, `error` and `cmdutil` lib.
 
 # Installation
 
