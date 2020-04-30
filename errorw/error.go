@@ -48,9 +48,18 @@ func (e *Error) APIErrorCause() *status.Status {
 	return nil
 }
 
-// APIErrorCause return the root cause of the API error.
+// APIErrorCause return the internal error's gRPC status or the root cause of the API error.
+// Priority returns the internal error's gRPC status if it implements status.GRPCStatus.
 // Implement gRPC status.GRPCStatus function.
 func (e *Error) GRPCStatus() *status.Status {
+	if e.Err != nil {
+		if se, ok := e.Err.(interface {
+			GRPCStatus() *status.Status
+		}); ok {
+			return se.GRPCStatus()
+		}
+	}
+
 	return e.APIErrorCause()
 }
 
