@@ -113,6 +113,19 @@ func TestError_APIErrorCause(t *testing.T) {
 	assert.Nil(t, err.APIErrorCause())
 }
 
+func TestError_GRPCStatus(t *testing.T) {
+	// Have value
+	err := &Error{APIErrors: []*status.Status{
+		status.New(codes.Internal, "foo"),
+		status.New(codes.Internal, "bar"),
+	}}
+	assert.Equal(t, "foo", err.GRPCStatus().Message())
+
+	// Empty
+	err = &Error{}
+	assert.Nil(t, err.GRPCStatus())
+}
+
 func TestError_WithAPIError(t *testing.T) {
 	err := New(errors.New("foo")).
 		WithAPIError(status.New(codes.Internal, "foo")).
@@ -175,4 +188,16 @@ func TestNewMessagef(t *testing.T) {
 	err := NewMessagef(format, args...)
 
 	assert.Equal(t, fmt.Sprintf(format, args...), err.Error())
+}
+
+func TestNewAPIError(t *testing.T) {
+	apiErr := status.New(codes.Internal, "test")
+	err := NewAPIError(apiErr)
+
+	assert.Error(t, err)
+	assert.Equal(t, "test", err.Err.Error())
+	assert.Equal(t, "test", err.Error())
+	assert.Len(t, err.APIErrors, 1)
+	assert.Equal(t, apiErr, err.APIErrorCause())
+	assert.Equal(t, apiErr, err.GRPCStatus())
 }

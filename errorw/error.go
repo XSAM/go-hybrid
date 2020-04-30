@@ -29,12 +29,13 @@ var _ error = (*Error)(nil)
 var _ stackTracer = (*Error)(nil)
 var _ causer = (*Error)(nil)
 var _ zapcore.ObjectMarshaler = (*Error)(nil)
+var _ interface{ GRPCStatus() *status.Status } = (*Error)(nil)
 
 func (e *Error) Error() string {
 	return Render(e)
 }
 
-// Cause implement errors.Cause interface
+// Cause implement errors.Cause interface.
 func (e *Error) Cause() error {
 	return pkgerrors.Cause(e.Err)
 }
@@ -47,13 +48,19 @@ func (e *Error) APIErrorCause() *status.Status {
 	return nil
 }
 
+// APIErrorCause return the root cause of the API error.
+// Implement gRPC status.GRPCStatus function.
+func (e *Error) GRPCStatus() *status.Status {
+	return e.APIErrorCause()
+}
+
 // WithAPIError append API error to error
 func (e *Error) WithAPIError(apiError *status.Status) *Error {
 	e.APIErrors = append(e.APIErrors, apiError)
 	return e
 }
 
-// WithAPIError append key/value to error
+// WithField append key/value to error
 func (e *Error) WithField(key string, value interface{}) *Error {
 	if e.Fields == nil {
 		e.Fields = make(map[string]interface{})
@@ -63,7 +70,7 @@ func (e *Error) WithField(key string, value interface{}) *Error {
 	return e
 }
 
-// WithAPIError append fields to error.
+// WithFields append fields to error.
 // Parameter fields will cover value which key is already exists.
 func (e *Error) WithFields(fields map[string]interface{}) *Error {
 	if e.Fields == nil {
@@ -82,13 +89,13 @@ func (e *Error) WithWrap(message string) *Error {
 	return e
 }
 
-// WithWrap set trace id to error
+// WithTraceID set trace id to error
 func (e *Error) WithTraceID(traceID string) *Error {
 	e.TraceID = traceID
 	return e
 }
 
-// New a error
+// New create an error
 func New(err error) *Error {
 	return newError(err, 4)
 }
@@ -99,8 +106,8 @@ func newError(err error, skip int) *Error {
 	}
 
 	return &Error{
-		Err:     err,
-		Stack:   callers(skip),
+		Err:   err,
+		Stack: callers(skip),
 	}
 }
 
@@ -116,10 +123,19 @@ func Wrap(err error, message string) *Error {
 	return New(err).WithWrap(message)
 }
 
+// NewMessage create an error with message.
 func NewMessage(message string) *Error {
 	return newError(errors.New(message), 4)
 }
 
+// NewMessagef create an error with message.
+// It will formats according to a format specifier and returns the resulting string.
 func NewMessagef(format string, args ...interface{}) *Error {
 	return newError(fmt.Errorf(format, args...), 4)
+}
+
+// NewAPIError create an error and append API error.
+func NewAPIError(apiError *status.Status) *Error {
+	return newError(errors.New(apiError.Message()), 4).
+		WithAPIError(apiError)
 }
