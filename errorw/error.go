@@ -35,7 +35,7 @@ func (e *Error) Error() string {
 	return Render(e)
 }
 
-// Cause implement errors.Cause interface
+// Cause implement errors.Cause interface.
 func (e *Error) Cause() error {
 	return pkgerrors.Cause(e.Err)
 }
@@ -60,7 +60,7 @@ func (e *Error) WithAPIError(apiError *status.Status) *Error {
 	return e
 }
 
-// WithAPIError append key/value to error
+// WithField append key/value to error
 func (e *Error) WithField(key string, value interface{}) *Error {
 	if e.Fields == nil {
 		e.Fields = make(map[string]interface{})
@@ -70,7 +70,7 @@ func (e *Error) WithField(key string, value interface{}) *Error {
 	return e
 }
 
-// WithAPIError append fields to error.
+// WithFields append fields to error.
 // Parameter fields will cover value which key is already exists.
 func (e *Error) WithFields(fields map[string]interface{}) *Error {
 	if e.Fields == nil {
@@ -89,7 +89,7 @@ func (e *Error) WithWrap(message string) *Error {
 	return e
 }
 
-// WithWrap set trace id to error
+// WithTraceID set trace id to error
 func (e *Error) WithTraceID(traceID string) *Error {
 	e.TraceID = traceID
 	return e
