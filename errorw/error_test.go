@@ -147,6 +147,13 @@ func TestError_GRPCStatus(t *testing.T) {
 				}},
 			expectedGRPCStatus: status.New(codes.Internal, "root"),
 		},
+		{
+			name: "if no gRPC status can be use, then create a gRPC status with internal error",
+			err: &Error{
+				Err: errors.New("error"),
+			},
+			expectedGRPCStatus: status.New(codes.Internal, "error"),
+		},
 	}
 
 	for _, tc := range testCases {
