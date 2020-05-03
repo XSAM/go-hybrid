@@ -6,6 +6,7 @@ import (
 
 	pkgerrors "github.com/pkg/errors"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
@@ -50,6 +51,7 @@ func (e *Error) APIErrorCause() *status.Status {
 
 // APIErrorCause return the internal error's gRPC status or the root cause of the API error.
 // Priority returns the internal error's gRPC status if it implements status.GRPCStatus.
+// If no gRPC status can be use, then create a gRPC status with internal error.
 // Implement gRPC status.GRPCStatus function.
 func (e *Error) GRPCStatus() *status.Status {
 	if e.Err != nil {
@@ -59,8 +61,16 @@ func (e *Error) GRPCStatus() *status.Status {
 			return se.GRPCStatus()
 		}
 	}
-
-	return e.APIErrorCause()
+	
+	st := e.APIErrorCause()
+	if st != nil {
+		return st
+	}
+	
+	if e.Err != nil {
+		return status.New(codes.Internal, e.Err.Error())
+	}
+	return nil
 }
 
 // WithAPIError append API error to error
