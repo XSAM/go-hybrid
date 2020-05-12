@@ -4,6 +4,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"bou.ke/monkey"
 	"github.com/spf13/cobra"
@@ -52,9 +53,13 @@ type TestIgnore struct {
 
 type testType struct {
 	Int            int               `flag:""`
+	Int32          int32             `flag:""`
+	Int64          int64             `flag:""`
+	Duration       time.Duration     `flag:""`
 	String         string            `flag:""`
 	Bool           bool              `flag:""`
 	IntSlice       []int             `flag:""`
+	DurationSlice  []time.Duration   `flag:""`
 	StringSlice    []string          `flag:""`
 	BoolSlice      []bool            `flag:""`
 	StringToString map[string]string `flag:""`
@@ -99,9 +104,13 @@ func Test_resolveFlags(t *testing.T) {
 		{Name: "flat2", FullName: "flat2", FullEnv: "FLAT2", Type: "string", Value: "", Pointer: &f.Flat2.Flat2},
 
 		{Name: "int", FullName: "type-int", FullEnv: "TYPE_INT", Type: "int", Value: 0, Pointer: &f.Type.Int},
+		{Name: "int32", FullName: "type-int32", FullEnv: "TYPE_INT32", Type: "int32", Value: int32(0), Pointer: &f.Type.Int32},
+		{Name: "int64", FullName: "type-int64", FullEnv: "TYPE_INT64", Type: "int64", Value: int64(0), Pointer: &f.Type.Int64},
+		{Name: "duration", FullName: "type-duration", FullEnv: "TYPE_DURATION", Type: "time.duration", Value: time.Duration(0), Pointer: &f.Type.Duration},
 		{Name: "string", FullName: "type-string", FullEnv: "TYPE_STRING", Type: "string", Value: "", Pointer: &f.Type.String},
 		{Name: "bool", FullName: "type-bool", FullEnv: "TYPE_BOOL", Type: "bool", Value: false, Pointer: &f.Type.Bool},
 		{Name: "int-slice", FullName: "type-int-slice", FullEnv: "TYPE_INT_SLICE", Type: "int-slice", Value: ([]int)(nil), Pointer: &f.Type.IntSlice},
+		{Name: "duration-slice", FullName: "type-duration-slice", FullEnv: "TYPE_DURATION_SLICE", Type: "time.duration-slice", Value: ([]time.Duration)(nil), Pointer: &f.Type.DurationSlice},
 		{Name: "string-slice", FullName: "type-string-slice", FullEnv: "TYPE_STRING_SLICE", Type: "string-slice", Value: ([]string)(nil), Pointer: &f.Type.StringSlice},
 		{Name: "bool-slice", FullName: "type-bool-slice", FullEnv: "TYPE_BOOL_SLICE", Type: "bool-slice", Value: ([]bool)(nil), Pointer: &f.Type.BoolSlice},
 		{Name: "string-to-string", FullName: "type-string-to-string", FullEnv: "TYPE_STRING_TO_STRING", Type: "string-to-string", Value: (map[string]string)(nil), Pointer: &f.Type.StringToString},
@@ -167,6 +176,20 @@ func Test_resolveCobraType(t *testing.T) {
 			expectedType: "int",
 		},
 		{
+			name: "int32",
+			field: struct {
+				M int32
+			}{},
+			expectedType: "int32",
+		},
+		{
+			name: "int64",
+			field: struct {
+				M int64
+			}{},
+			expectedType: "int64",
+		},
+		{
 			name: "bool",
 			field: struct {
 				M bool
@@ -181,11 +204,32 @@ func Test_resolveCobraType(t *testing.T) {
 			expectedType: "string",
 		},
 		{
+			name: "time.Duration",
+			field: struct {
+				M time.Duration
+			}{},
+			expectedType: "time.duration",
+		},
+		{
 			name: "int-slice",
 			field: struct {
 				M []int
 			}{},
 			expectedType: "int-slice",
+		},
+		{
+			name: "int64-slice",
+			field: struct {
+				M []int64
+			}{},
+			expectedType: "int64-slice",
+		},
+		{
+			name: "time.Duration-slice",
+			field: struct {
+				M []time.Duration
+			}{},
+			expectedType: "time.duration-slice",
 		},
 		{
 			name: "bool-slice",

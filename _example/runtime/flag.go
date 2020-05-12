@@ -1,8 +1,11 @@
 package runtime
 
+import "time"
+
 type Flag struct {
-	Number      int         `flag:"env"`
-	Environment Environment `flag:""`
+	Number      int           `flag:"env"`
+	Duration    time.Duration `flag:""`
+	Environment Environment   `flag:""`
 }
 
 type Environment struct {
