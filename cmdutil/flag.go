@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -52,6 +53,15 @@ func resolveCobraType(field reflect.StructField, tag flagTag) string {
 	switch field.Type.Kind() {
 	case reflect.Int:
 		return "int"
+	case reflect.Int32:
+		return "int32"
+	case reflect.Int64:
+		switch field.Type.String() {
+		case "time.Duration":
+			return "time.duration"
+		default:
+			return "int64"
+		}
 	case reflect.Bool:
 		return "bool"
 	case reflect.String:
@@ -60,6 +70,13 @@ func resolveCobraType(field reflect.StructField, tag flagTag) string {
 		switch field.Type.Elem().Kind() {
 		case reflect.Int:
 			return "int-slice"
+		case reflect.Int64:
+			switch field.Type.Elem().String() {
+			case "time.Duration":
+				return "time.duration-slice"
+			default:
+				return "int64-slice"
+			}
 		case reflect.Bool:
 			return "bool-slice"
 		case reflect.String:
@@ -201,8 +218,16 @@ func ResolveFlagVariable(cmd *cobra.Command, f interface{}) (err error) {
 			cmd.PersistentFlags().StringVarP(v.Pointer.(*string), v.FullName, v.Shorthand, v.Value.(string), v.Usage)
 		case "int":
 			cmd.PersistentFlags().IntVarP(v.Pointer.(*int), v.FullName, v.Shorthand, v.Value.(int), v.Usage)
+		case "int32":
+			cmd.PersistentFlags().Int32VarP(v.Pointer.(*int32), v.FullName, v.Shorthand, v.Value.(int32), v.Usage)
+		case "int64":
+			cmd.PersistentFlags().Int64VarP(v.Pointer.(*int64), v.FullName, v.Shorthand, v.Value.(int64), v.Usage)
+		case "time.duration":
+			cmd.PersistentFlags().DurationVarP(v.Pointer.(*time.Duration), v.FullName, v.Shorthand, v.Value.(time.Duration), v.Usage)
 		case "int-slice":
 			cmd.PersistentFlags().IntSliceVarP(v.Pointer.(*[]int), v.FullName, v.Shorthand, v.Value.([]int), v.Usage)
+		case "time.duration-slice":
+			cmd.PersistentFlags().DurationSliceVarP(v.Pointer.(*[]time.Duration), v.FullName, v.Shorthand, v.Value.([]time.Duration), v.Usage)
 		case "string-slice":
 			cmd.PersistentFlags().StringSliceVarP(v.Pointer.(*[]string), v.FullName, v.Shorthand, v.Value.([]string), v.Usage)
 		case "bool-slice":
