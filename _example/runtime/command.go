@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"time"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -85,10 +86,11 @@ func logCmd() *cobra.Command {
 			// Context logger
 			log.BgLogger().Info("-- context logger --")
 			ctx := log.WithKeyValue(context.Background(), "hello", "world")
-			log.Logger(ctx).Debug("debug")
-			log.Logger(ctx).Info("info")
-			log.Logger(ctx).Warn("warn")
-			log.Logger(ctx).Error("error")
+			zapFields := []zap.Field{zap.Duration("duration", 42*time.Second), zap.Time("date", time.Now())}
+			log.Logger(ctx).Debug("debug", zapFields...)
+			log.Logger(ctx).Info("info", zapFields...)
+			log.Logger(ctx).Warn("warn", zapFields...)
+			log.Logger(ctx).Error("error", zapFields...)
 
 			// Print errorw
 			log.BgLogger().Info("-- print errorw --")
