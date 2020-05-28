@@ -182,13 +182,17 @@ func TestWithZapOptions(t *testing.T) {
 }
 
 func NewObservedLogger() (*Core, *observer.ObservedLogs) {
-	ob, logs := observer.New(zapcore.InfoLevel)
-	logger := Core{Logger: zap.New(ob)}
-	return &logger, logs
+	return NewObservedLoggerWithLevel(zapcore.InfoLevel)
 }
 
 func NewContextWithObservedLogger() (context.Context, *observer.ObservedLogs) {
 	logger, logs := NewObservedLogger()
 	ctxWithLogger := WithLogger(context.Background(), logger)
 	return ctxWithLogger, logs
+}
+
+func NewObservedLoggerWithLevel(level zapcore.Level) (*Core, *observer.ObservedLogs) {
+	ob, logs := observer.New(level)
+	logger := Core{Logger: zap.New(ob)}
+	return &logger, logs
 }
