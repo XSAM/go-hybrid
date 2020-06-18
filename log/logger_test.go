@@ -191,8 +191,10 @@ func NewContextWithObservedLogger() (context.Context, *observer.ObservedLogs) {
 	return ctxWithLogger, logs
 }
 
-func NewObservedLoggerWithLevel(level zapcore.Level) (*Core, *observer.ObservedLogs) {
+func NewObservedLoggerWithLevel(level zapcore.Level, options ...zap.Option) (*Core, *observer.ObservedLogs) {
+	options = append(options, zap.AddCallerSkip(1))
+
 	ob, logs := observer.New(level)
-	logger := Core{Logger: zap.New(ob)}
+	logger := Core{Logger: zap.New(ob, options...)}
 	return &logger, logs
 }
