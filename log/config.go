@@ -65,7 +65,7 @@ func BuildLogger(config Config) *Core {
 	// Dynamic log level
 	config.ZapConfig.Level = *GetLevels().Get()
 
-	zapLogger, err := config.ZapConfig.Build()
+	zapLogger, err := config.ZapConfig.Build(zap.AddCallerSkip(1))
 	if err != nil {
 		panic("init zap logger: " + err.Error())
 	}
