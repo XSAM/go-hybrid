@@ -15,10 +15,6 @@ func PlainRender(e *Error) string {
 	}
 	buf.WriteString(e.Err.Error())
 
-	if e.TraceID != "" {
-		buf.WriteString(fmt.Sprintf(". traceID: %s", e.TraceID))
-	}
-
 	if len(e.Fields) > 0 {
 		buf.WriteString(fmt.Sprintf(". fields:"))
 		for k, v := range e.Fields {

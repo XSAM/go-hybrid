@@ -17,7 +17,6 @@ type Error struct {
 	Wrapper []string
 	Fields  map[string]interface{}
 
-	TraceID   string
 	APIErrors []*status.Status
 }
 
@@ -61,12 +60,12 @@ func (e *Error) GRPCStatus() *status.Status {
 			return se.GRPCStatus()
 		}
 	}
-	
+
 	st := e.APIErrorCause()
 	if st != nil {
 		return st
 	}
-	
+
 	if e.Err != nil {
 		return status.New(codes.Internal, e.Err.Error())
 	}
@@ -105,12 +104,6 @@ func (e *Error) WithFields(fields map[string]interface{}) *Error {
 // WithWrap wrap message to error
 func (e *Error) WithWrap(message string) *Error {
 	e.Wrapper = append(e.Wrapper, message)
-	return e
-}
-
-// WithTraceID set trace id to error
-func (e *Error) WithTraceID(traceID string) *Error {
-	e.TraceID = traceID
 	return e
 }
 

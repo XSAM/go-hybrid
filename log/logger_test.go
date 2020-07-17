@@ -73,18 +73,6 @@ func TestLoggerOutput(t *testing.T) {
 	assert.Equal(t, "value", contextMap["key"])
 }
 
-func TestWithTraceID(t *testing.T) {
-	ctx, logs := NewContextWithObservedLogger()
-	ctx = WithTraceID(ctx, "trace_id")
-
-	Logger(ctx).Info("testing output")
-
-	log := logs.All()[0]
-	assert.Equal(t, "testing output", log.Message)
-	contextMap := log.ContextMap()
-	assert.Equal(t, "trace_id", contextMap["trace_id"])
-}
-
 func TestWithKeyValue(t *testing.T) {
 	ctx, logs := NewContextWithObservedLogger()
 

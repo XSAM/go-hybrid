@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"go.uber.org/zap"
-
-	"github.com/XSAM/go-hybrid/consts"
 )
 
 type contextKey int
@@ -46,11 +44,6 @@ func BgLogger() *Core {
 // SetBgLogger set background logger
 func SetBgLogger(logger *Core) {
 	bgLogger = logger.clone()
-}
-
-// WithTraceID attach trace id to logger
-func WithTraceID(ctx context.Context, traceID string) context.Context {
-	return WithKeyValue(ctx, consts.TraceID, traceID)
 }
 
 // WithKeyValue attach key/value to logger

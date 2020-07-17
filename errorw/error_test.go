@@ -87,10 +87,9 @@ func TestError_Error(t *testing.T) {
 	err := New(errors.New("foo"))
 	err = err.WithField("foo", "bar").
 		WithWrap("test").
-		WithWrap("test2").
-		WithTraceID("trace_id")
+		WithWrap("test2")
 
-	assert.Equal(t, "test2: test: foo. traceID: trace_id. fields: foo:bar", err.Error())
+	assert.Equal(t, "test2: test: foo. fields: foo:bar", err.Error())
 }
 
 func TestError_Cause(t *testing.T) {
@@ -204,13 +203,6 @@ func TestError_WithWrap(t *testing.T) {
 		WithWrap("foo").WithWrap("bar")
 
 	assert.Equal(t, []string{"foo", "bar"}, err.Wrapper)
-}
-
-func TestError_WithTraceID(t *testing.T) {
-	err := NewMessage("foo").WithTraceID("id")
-
-	assert.Equal(t, "foo. traceID: id", err.Error())
-	assert.Equal(t, "id", err.TraceID)
 }
 
 func TestNewMessage(t *testing.T) {

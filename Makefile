@@ -1,6 +1,6 @@
-default: build
+default: all
 
-.PHONY: build, test
+.PHONY: build test install-tool all
 
 git_revision=git rev-parse --short HEAD
 BUILD_TIME=`date +%FT%T%z`
@@ -18,6 +18,8 @@ FLAGS=-trimpath -ldflags "-s ${INJECT_VARIABLE}"
 DEBUG_FLAGS=-gcflags "all=-N -l" ${FLAGS}
 
 export CGO_ENABLED=0
+
+all: check test build
 
 build:
 	@echo "> Building example"
