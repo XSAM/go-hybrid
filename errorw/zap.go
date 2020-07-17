@@ -10,11 +10,6 @@ import (
 
 // MarshalLogObject is an implementation of `zapcore.ObjectMarshaler` interface
 func (e *Error) MarshalLogObject(enc zapcore.ObjectEncoder) error {
-	// Trace ID
-	if e.TraceID != "" {
-		enc.AddString("trace_id", e.TraceID)
-	}
-
 	// Error message
 	var buf bytes.Buffer
 	for i := len(e.Wrapper) - 1; i >= 0; i-- {

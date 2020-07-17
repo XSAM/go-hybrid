@@ -18,11 +18,10 @@ func TestPlainRender(t *testing.T) {
 	err = err.WithField("foo", "bar").
 		WithField("struct_field", structField).
 		WithWrap("test").
-		WithWrap("test2").
-		WithTraceID("trace_id")
+		WithWrap("test2")
 
-	expectedResult1 := "test2: test: foo. traceID: trace_id. fields: foo:bar struct_field:{Foo:foo Bar:[bar1 bar2]}"
-	expectedResult2 := "test2: test: foo. traceID: trace_id. fields: struct_field:{Foo:foo Bar:[bar1 bar2]} foo:bar"
+	expectedResult1 := "test2: test: foo. fields: foo:bar struct_field:{Foo:foo Bar:[bar1 bar2]}"
+	expectedResult2 := "test2: test: foo. fields: struct_field:{Foo:foo Bar:[bar1 bar2]} foo:bar"
 	result := PlainRender(err)
 
 	if result != expectedResult1 && result != expectedResult2 {

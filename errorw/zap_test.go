@@ -32,8 +32,7 @@ func TestError_MarshalLogObject2(t *testing.T) {
 	ob, logs := observer.New(zapcore.InfoLevel)
 	logger := zap.New(ob)
 
-	// Set trace id
-	e := New(errors.New("testing error")).WithWrap("wrap").WithTraceID("trace_id")
+	e := New(errors.New("testing error")).WithWrap("wrap")
 	// Set cause error is nil
 	e.Err = nil
 
@@ -44,5 +43,4 @@ func TestError_MarshalLogObject2(t *testing.T) {
 	err := contextMap["error"].(map[string]interface{})
 	assert.Equal(t, "test", log.Message)
 	assert.Equal(t, "wrap: nil", err["msg"])
-	assert.Equal(t, "trace_id", err["trace_id"])
 }
