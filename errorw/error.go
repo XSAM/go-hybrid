@@ -135,6 +135,19 @@ func Wrap(err error, message string) *Error {
 	return New(err).WithWrap(message)
 }
 
+// Wrapf wrap message with formats.
+func Wrapf(err error, format string, args ...interface{}) *Error {
+	if err == nil {
+		return nil
+	}
+
+	message := fmt.Sprintf(format, args...)
+	if val, ok := err.(*Error); ok {
+		return val.WithWrap(message)
+	}
+	return New(err).WithWrap(message)
+}
+
 // NewMessage create an error with message.
 func NewMessage(message string) *Error {
 	return newError(errors.New(message), 4)
