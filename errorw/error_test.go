@@ -83,6 +83,37 @@ func TestWrap2(t *testing.T) {
 	assert.Equal(t, messages, e.Wrapper)
 }
 
+func TestWrapf(t *testing.T) {
+	testCases := []struct {
+		name string
+		err  error
+	}{
+		{
+			name: "error is nil",
+		},
+		{
+			name: "error type is errorw.Error",
+			err:  New(errors.New("testing")),
+		},
+		{
+			name: "error type is not errorw.Error",
+			err:  errors.New("testing"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := Wrapf(tc.err, "%s", "foo")
+			if tc.err == nil {
+				assert.Nil(t, err)
+			} else {
+				assert.Len(t, err.Wrapper, 1)
+				assert.Equal(t, "foo", err.Wrapper[0])
+			}
+		})
+	}
+}
+
 func TestError_Error(t *testing.T) {
 	err := New(errors.New("foo"))
 	err = err.WithField("foo", "bar").
