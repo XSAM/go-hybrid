@@ -200,6 +200,8 @@ func TestError_WithAPIError(t *testing.T) {
 		WithAPIError(status.New(codes.Internal, "bar"))
 
 	assert.Equal(t, "foo", err.APIErrorCause().Message())
+	
+	assert.Nil(t, (*Error)(nil).WithAPIError(status.New(codes.Internal, "foo")))
 }
 
 func TestError_WithField(t *testing.T) {
@@ -211,6 +213,8 @@ func TestError_WithField(t *testing.T) {
 		"foo": "foo",
 		"bar": "bar",
 	}, err.Fields)
+	
+	assert.Nil(t, (*Error)(nil).WithField("foo", "foo"))
 }
 
 func TestError_WithFields(t *testing.T) {
@@ -227,6 +231,11 @@ func TestError_WithFields(t *testing.T) {
 		"bar":  "bar",
 		"bar2": "bar",
 	}, err.Fields)
+	
+	assert.Nil(t, (*Error)(nil).WithFields(map[string]interface{}{
+		"foo": "foo",
+		"bar": "bar",
+	}))
 }
 
 func TestError_WithWrap(t *testing.T) {
@@ -234,6 +243,8 @@ func TestError_WithWrap(t *testing.T) {
 		WithWrap("foo").WithWrap("bar")
 
 	assert.Equal(t, []string{"foo", "bar"}, err.Wrapper)
+	
+	assert.Nil(t, (*Error)(nil).WithWrap("foo"))
 }
 
 func TestNewMessage(t *testing.T) {

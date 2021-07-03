@@ -16,7 +16,7 @@ func PlainRender(e *Error) string {
 	buf.WriteString(e.Err.Error())
 
 	if len(e.Fields) > 0 {
-		buf.WriteString(fmt.Sprintf(". fields:"))
+		buf.WriteString(". fields:")
 		for k, v := range e.Fields {
 			buf.WriteString(fmt.Sprintf(" %s:%+v", k, v))
 		}
