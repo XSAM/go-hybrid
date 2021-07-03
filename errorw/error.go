@@ -48,7 +48,7 @@ func (e *Error) APIErrorCause() *status.Status {
 	return nil
 }
 
-// APIErrorCause return the internal error's gRPC status or the root cause of the API error.
+// GRPCStatus return the internal error's gRPC status or the root cause of the API error.
 // Priority returns the internal error's gRPC status if it implements status.GRPCStatus.
 // If no gRPC status can be use, then create a gRPC status with internal error.
 // Implement gRPC status.GRPCStatus function.
@@ -74,12 +74,20 @@ func (e *Error) GRPCStatus() *status.Status {
 
 // WithAPIError append API error to error
 func (e *Error) WithAPIError(apiError *status.Status) *Error {
+	if e == nil {
+		return nil
+	}
+	
 	e.APIErrors = append(e.APIErrors, apiError)
 	return e
 }
 
 // WithField append key/value to error
 func (e *Error) WithField(key string, value interface{}) *Error {
+	if e == nil {
+		return nil
+	}
+	
 	if e.Fields == nil {
 		e.Fields = make(map[string]interface{})
 	}
@@ -91,6 +99,10 @@ func (e *Error) WithField(key string, value interface{}) *Error {
 // WithFields append fields to error.
 // Parameter fields will cover value which key is already exists.
 func (e *Error) WithFields(fields map[string]interface{}) *Error {
+	if e == nil {
+		return nil
+	}
+	
 	if e.Fields == nil {
 		e.Fields = fields
 	} else {
@@ -103,6 +115,10 @@ func (e *Error) WithFields(fields map[string]interface{}) *Error {
 
 // WithWrap wrap message to error
 func (e *Error) WithWrap(message string) *Error {
+	if e == nil {
+		return nil
+	}
+	
 	e.Wrapper = append(e.Wrapper, message)
 	return e
 }
