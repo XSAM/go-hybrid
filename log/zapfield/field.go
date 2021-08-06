@@ -15,6 +15,10 @@ func Stack() zap.Field {
 
 // Error add error field
 func Error(err error) zap.Field {
+	if err == nil {
+		return zap.Skip()
+	}
+	
 	if environment.LogStyle == environment.LogStyleText {
 		// Text style
 		switch environment.Mode {
