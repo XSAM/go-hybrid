@@ -96,6 +96,16 @@ func TestError(t *testing.T) {
 	}
 }
 
+func TestNilError(t *testing.T) {
+	logger, logs := newObservedLogger()
+	logger.Info("testing", Error(nil))
+	
+	l := logs.All()[0]
+	assert.Equal(t, "testing", l.Message)
+	contextMap := l.ContextMap()
+	assert.Empty(t, contextMap["error"])
+}
+
 func newObservedLogger() (*log.Core, *observer.ObservedLogs) {
 	ob, logs := observer.New(zapcore.InfoLevel)
 	logger := log.Core{Logger: zap.New(ob)}
