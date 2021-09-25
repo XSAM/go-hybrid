@@ -23,6 +23,7 @@ type flag struct {
 	FullName  string
 	Shorthand string
 	Usage     string
+	Required  bool
 
 	// Enable env
 	EnableEnv bool
@@ -147,6 +148,7 @@ func resolveFlags(obj interface{}, flags flags, namePrefix string, depth int) fl
 				FullName:  fullName,
 				Shorthand: tag.shorthand,
 				Usage:     tag.usage,
+				Required:  tag.required,
 				EnableEnv: tag.enableEnv,
 				FullEnv:   genEnv(fullName),
 				EnvSplit:  tag.envSplit,
@@ -238,6 +240,11 @@ func ResolveFlagVariable(cmd *cobra.Command, f interface{}) (err error) {
 			cmd.PersistentFlags().StringToIntVarP(v.Pointer.(*map[string]int), v.FullName, v.Shorthand, v.Value.(map[string]int), v.Usage)
 		default:
 			return errorw.NewMessagef("not supported flag type: %s", v.Type)
+		}
+
+		if v.Required {
+			// Logically, it won't cause errors.
+			cmd.MarkPersistentFlagRequired(v.FullName) // nolint
 		}
 	}
 

@@ -47,6 +47,10 @@ func Test_resolveFlagTag(t *testing.T) {
 			structTag:       `flag:"" flag-usage:"foo"`,
 			expectedFlagTag: flagTag{enable: true, usage: "foo"},
 		},
+		{
+			structTag:       `flag:"required"`,
+			expectedFlagTag: flagTag{enable: true, required: true},
+		},
 	}
 
 	for _, tc := range testCases {

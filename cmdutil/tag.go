@@ -19,6 +19,7 @@ type flagTag struct {
 	// Without prefix name
 	flagType  string
 	flat      bool
+	required  bool
 	shorthand string
 	usage     string
 
@@ -58,12 +59,15 @@ func resolveFlagTag(structTag reflect.StructTag) flagTag {
 	}
 
 	// Fill struct
-	var flat, enableEnv bool
+	var flat, enableEnv, required bool
 	if v, ok := flagKV["flat"]; ok {
 		flat = parseBool(v)
 	}
 	if v, ok := flagKV["env"]; ok {
 		enableEnv = parseBool(v)
+	}
+	if v, ok := flagKV["required"]; ok {
+		required = parseBool(v)
 	}
 	var name *string
 	if v, ok := flagKV["name"]; ok {
@@ -74,6 +78,7 @@ func resolveFlagTag(structTag reflect.StructTag) flagTag {
 		enable:    true,
 		name:      name,
 		flat:      flat,
+		required:  required,
 		flagType:  flagKV["type"],
 		shorthand: flagKV["short"],
 		// Prevent parse error since usage may have ','
