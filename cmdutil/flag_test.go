@@ -27,6 +27,8 @@ type testFlag struct {
 	OverwriteName   string     `flag:"name=new-name"`
 	OverwritePrefix testPrefix `flag:"name=new-prefix"`
 
+	Required string `flag:"required"`
+
 	Short      string `flag:""`
 	ShortEnv   string `flag:"env"`
 	ShortFlat  string `flag:"flat"`
@@ -91,6 +93,8 @@ func Test_resolveFlags(t *testing.T) {
 
 		{Name: "new-name", FullName: "new-name", FullEnv: "NEW_NAME", Type: "string", Value: "", Pointer: &f.OverwriteName},
 		{Name: "prefix", FullName: "new-prefix-prefix", FullEnv: "NEW_PREFIX_PREFIX", Type: "string", Value: "", Pointer: &f.OverwritePrefix.Prefix},
+
+		{Name: "required", FullName: "required", FullEnv: "REQUIRED", Type: "string", Value: "", Required: true, Pointer: &f.Required},
 
 		{Name: "short", FullName: "short", FullEnv: "SHORT", Type: "string", Value: "", Pointer: &f.Short},
 		{Name: "short-env", FullName: "short-env", FullEnv: "SHORT_ENV", EnableEnv: true, Type: "string", Value: "", Pointer: &f.ShortEnv},
@@ -473,4 +477,18 @@ func TestResolveFlagVariableWithWrongEnvSplit(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "set env value with delimiter")
+}
+
+func TestResolveFlagVariableWithRequired(t *testing.T) {
+	m := struct {
+		Name string `flag:"required"`
+	}{}
+
+	cmd := cobra.Command{}
+	err := ResolveFlagVariable(&cmd, &m)
+	assert.NoError(t, err)
+
+	cmd.PersistentFlags().VisitAll(func(flag *pflag.Flag) {
+		assert.Equal(t, []string{"true"}, flag.Annotations[cobra.BashCompOneRequiredFlag])
+	})
 }
